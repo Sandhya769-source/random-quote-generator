@@ -1,0 +1,168 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px 20px;
+  background: linear-gradient(
+    135deg,
+    #667eea,
+    #764ba2
+  );
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 35px;
+}
+
+.header h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+main {
+  width: 100%;
+  max-width: 700px;
+}
+
+.quote-card {
+  background: white;
+  border-radius: 24px;
+  padding: 45px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.quote-mark {
+  font-size: 70px;
+  line-height: 50px;
+  color: #667eea;
+}
+
+.quote-text {
+  font-size: 30px;
+  line-height: 1.5;
+  color: #222;
+  margin: 25px 0;
+}
+
+.quote-author {
+  font-size: 18px;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.quote-category {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: #eee9ff;
+  color: #6644aa;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.quote-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 35px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  border: none;
+  background: #f3f3f3;
+  color: #333;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  background: #e5e5e5;
+}
+
+.favorite-active {
+  background: #ffe1e6;
+  color: #e63950;
+}
+
+.new-quote-button {
+  margin-top: 30px;
+  width: 100%;
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  background: #667eea;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s;
+}
+
+.new-quote-button:hover {
+  transform: translateY(-2px);
+  background: #5568d9;
+}
+
+footer {
+  margin-top: auto;
+  padding-top: 40px;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 30px 15px;
+  }
+
+  .header h1 {
+    font-size: 30px;
+  }
+
+  .quote-card {
+    padding: 30px 20px;
+  }
+
+  .quote-text {
+    font-size: 23px;
+  }
+
+  .quote-actions {
+    flex-direction: column;
+  }
+
+  .action-button {
+    justify-content: center;
+  }
+}
