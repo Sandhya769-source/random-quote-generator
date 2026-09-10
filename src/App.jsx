@@ -7,6 +7,7 @@ import "./App.css";
 function App() {
   const [currentQuote, setCurrentQuote] = useState(quotes[0]);
 
+  // Load favorites from localStorage
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites =
       localStorage.getItem("favoriteQuotes");
@@ -22,16 +23,18 @@ function App() {
   // Toast notification
   const [notification, setNotification] = useState("");
 
+  // Categories
   const categories = [
     "All",
     "Motivation",
     "Success",
     "Life",
     "Work",
-    "Dreams"
+    "Dreams",
+    "❤️ Favorites"
   ];
 
-  // Save favorites
+  // Save favorites to localStorage
   useEffect(() => {
     localStorage.setItem(
       "favoriteQuotes",
@@ -39,7 +42,7 @@ function App() {
     );
   }, [favorites]);
 
-  // Show modern notification
+  // Modern notification
   const showNotification = (message) => {
     setNotification(message);
 
@@ -48,12 +51,19 @@ function App() {
     }, 2500);
   };
 
-  // Get filtered quotes
+  // Get quotes based on selected category
   const getFilteredQuotes = () => {
+    // Favorites category
+    if (selectedCategory === "❤️ Favorites") {
+      return favorites;
+    }
+
+    // All quotes
     if (selectedCategory === "All") {
       return quotes;
     }
 
+    // Normal categories
     return quotes.filter(
       (quote) => quote.category === selectedCategory
     );
@@ -62,6 +72,12 @@ function App() {
   // Generate random quote
   const getRandomQuote = () => {
     const filteredQuotes = getFilteredQuotes();
+
+    // No favorites available
+    if (filteredQuotes.length === 0) {
+      showNotification("No favorite quotes yet ❤️");
+      return;
+    }
 
     const randomIndex = Math.floor(
       Math.random() * filteredQuotes.length
@@ -74,12 +90,35 @@ function App() {
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
 
-    const filteredQuotes =
-      category === "All"
-        ? quotes
-        : quotes.filter(
-            (quote) => quote.category === category
-          );
+    let filteredQuotes;
+
+    // Favorites
+    if (category === "❤️ Favorites") {
+      filteredQuotes = favorites;
+    }
+
+    // All
+    else if (category === "All") {
+      filteredQuotes = quotes;
+    }
+
+    // Other categories
+    else {
+      filteredQuotes = quotes.filter(
+        (quote) => quote.category === category
+      );
+    }
+
+    // No favorites
+    if (filteredQuotes.length === 0) {
+      if (category === "❤️ Favorites") {
+        showNotification(
+          "No favorite quotes yet ❤️"
+        );
+      }
+
+      return;
+    }
 
     const randomIndex = Math.floor(
       Math.random() * filteredQuotes.length
@@ -96,13 +135,17 @@ function App() {
     try {
       await navigator.clipboard.writeText(textToCopy);
 
-      showNotification("Quote copied successfully!");
+      showNotification(
+        "Quote copied successfully!"
+      );
     } catch (error) {
-      showNotification("Unable to copy quote.");
+      showNotification(
+        "Unable to copy quote."
+      );
     }
   };
 
-  // Favorite quote
+  // Add / Remove favorite
   const toggleFavorite = () => {
     const alreadyFavorite = favorites.some(
       (quote) => quote.id === currentQuote.id
@@ -115,14 +158,41 @@ function App() {
         )
       );
 
-      showNotification("Removed from favorites");
+      showNotification(
+        "Removed from favorites"
+      );
+
+      /*
+        If we are currently viewing Favorites
+        and remove the current quote, automatically
+        show another favorite.
+      */
+      if (selectedCategory === "❤️ Favorites") {
+        const remainingFavorites =
+          favorites.filter(
+            (quote) => quote.id !== currentQuote.id
+          );
+
+        if (remainingFavorites.length > 0) {
+          const randomIndex = Math.floor(
+            Math.random() *
+              remainingFavorites.length
+          );
+
+          setCurrentQuote(
+            remainingFavorites[randomIndex]
+          );
+        }
+      }
     } else {
       setFavorites([
         ...favorites,
         currentQuote
       ]);
 
-      showNotification("Added to favorites ❤️");
+      showNotification(
+        "Added to favorites ❤️"
+      );
     }
   };
 
@@ -149,7 +219,7 @@ function App() {
     }
   };
 
-  // Check favorite
+  // Check if current quote is favorite
   const isFavorite = favorites.some(
     (quote) => quote.id === currentQuote.id
   );
@@ -157,7 +227,10 @@ function App() {
   return (
     <div className="app">
 
-      {/* Modern Notification */}
+      {/* =================================
+          TOAST NOTIFICATION
+      ================================= */}
+
       {notification && (
         <div className="toast-notification">
           <FaCheckCircle className="toast-icon" />
@@ -166,16 +239,28 @@ function App() {
         </div>
       )}
 
-      {/* Header */}
+
+      {/* =================================
+          HEADER
+      ================================= */}
+
       <header className="header">
-        <h1>Random Quote Generator</h1>
+
+        <h1>
+          Random Quote Generator
+        </h1>
 
         <p>
           Get inspired with a new quote every time.
         </p>
+
       </header>
 
-      {/* Categories */}
+
+      {/* =================================
+          CATEGORY SECTION
+      ================================= */}
+
       <div className="category-container">
 
         <p className="category-title">
@@ -185,6 +270,7 @@ function App() {
         <div className="category-buttons">
 
           {categories.map((category) => (
+
             <button
               key={category}
               className={
@@ -198,31 +284,79 @@ function App() {
             >
               {category}
             </button>
+
           ))}
 
         </div>
 
       </div>
 
-      {/* Quote */}
+
+      {/* =================================
+          QUOTE SECTION
+      ================================= */}
+
       <main>
 
-        <QuoteCard
-          quote={currentQuote}
-          onNewQuote={getRandomQuote}
-          onCopy={copyQuote}
-          onFavorite={toggleFavorite}
-          onShare={shareQuote}
-          isFavorite={isFavorite}
-        />
+        {selectedCategory === "❤️ Favorites" &&
+        favorites.length === 0 ? (
+
+          <div className="empty-favorites">
+
+            <div className="empty-heart">
+              ❤️
+            </div>
+
+            <h2>
+              No Favorite Quotes Yet
+            </h2>
+
+            <p>
+              Click the ❤️ Favorite button on
+              a quote to save it here.
+            </p>
+
+            <button
+              className="browse-quotes-button"
+              onClick={() =>
+                handleCategoryChange("All")
+              }
+            >
+              ✨ Explore Quotes
+            </button>
+
+          </div>
+
+        ) : (
+
+          <QuoteCard
+            quote={currentQuote}
+            onNewQuote={getRandomQuote}
+            onCopy={copyQuote}
+            onFavorite={toggleFavorite}
+            onShare={shareQuote}
+            isFavorite={isFavorite}
+          />
+
+        )}
 
       </main>
 
-      {/* Modern Footer */}
+
+      {/* =================================
+          FOOTER
+      ================================= */}
+
       <footer>
+
         <p className="footer-message">
           <span>✨</span>
-          Find inspiration. Share positivity. Keep moving forward.
+          Find inspiration. Share positivity.
+          Keep moving forward.
+        </p>
+
+        <p className="footer-copyright">
+          Random Quote Generator • Made with React.js
         </p>
 
       </footer>
