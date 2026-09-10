@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
 import QuoteCard from "./components/QuoteCard";
 import quotes from "./data/quotes";
+import { FaCheckCircle } from "react-icons/fa";
 import "./App.css";
 
 function App() {
-  // Current displayed quote
   const [currentQuote, setCurrentQuote] = useState(quotes[0]);
 
-  // Load favorites from localStorage
   const [favorites, setFavorites] = useState(() => {
-    const savedFavorites = localStorage.getItem("favoriteQuotes");
+    const savedFavorites =
+      localStorage.getItem("favoriteQuotes");
 
-    return savedFavorites ? JSON.parse(savedFavorites) : [];
+    return savedFavorites
+      ? JSON.parse(savedFavorites)
+      : [];
   });
 
-  // Selected category
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] =
+    useState("All");
 
-  // Available categories
+  // Toast notification
+  const [notification, setNotification] = useState("");
+
   const categories = [
     "All",
     "Motivation",
@@ -27,7 +31,7 @@ function App() {
     "Dreams"
   ];
 
-  // Save favorites to localStorage whenever favorites change
+  // Save favorites
   useEffect(() => {
     localStorage.setItem(
       "favoriteQuotes",
@@ -35,7 +39,16 @@ function App() {
     );
   }, [favorites]);
 
-  // Get quotes based on selected category
+  // Show modern notification
+  const showNotification = (message) => {
+    setNotification(message);
+
+    setTimeout(() => {
+      setNotification("");
+    }, 2500);
+  };
+
+  // Get filtered quotes
   const getFilteredQuotes = () => {
     if (selectedCategory === "All") {
       return quotes;
@@ -46,7 +59,7 @@ function App() {
     );
   };
 
-  // Generate a random quote
+  // Generate random quote
   const getRandomQuote = () => {
     const filteredQuotes = getFilteredQuotes();
 
@@ -82,13 +95,14 @@ function App() {
 
     try {
       await navigator.clipboard.writeText(textToCopy);
-      alert("Quote copied!");
+
+      showNotification("Quote copied successfully!");
     } catch (error) {
-      alert("Unable to copy the quote.");
+      showNotification("Unable to copy quote.");
     }
   };
 
-  // Add or remove favorite
+  // Favorite quote
   const toggleFavorite = () => {
     const alreadyFavorite = favorites.some(
       (quote) => quote.id === currentQuote.id
@@ -100,11 +114,15 @@ function App() {
           (quote) => quote.id !== currentQuote.id
         )
       );
+
+      showNotification("Removed from favorites");
     } else {
       setFavorites([
         ...favorites,
         currentQuote
       ]);
+
+      showNotification("Added to favorites ❤️");
     }
   };
 
@@ -122,23 +140,31 @@ function App() {
       } else {
         await navigator.clipboard.writeText(text);
 
-        alert(
-          "Quote copied! You can share it anywhere."
+        showNotification(
+          "Quote copied! Ready to share."
         );
       }
     } catch (error) {
-      // User cancelled the share dialog
       console.log("Share cancelled.");
     }
   };
 
-  // Check whether current quote is already a favorite
+  // Check favorite
   const isFavorite = favorites.some(
     (quote) => quote.id === currentQuote.id
   );
 
   return (
     <div className="app">
+
+      {/* Modern Notification */}
+      {notification && (
+        <div className="toast-notification">
+          <FaCheckCircle className="toast-icon" />
+
+          <span>{notification}</span>
+        </div>
+      )}
 
       {/* Header */}
       <header className="header">
@@ -149,7 +175,7 @@ function App() {
         </p>
       </header>
 
-      {/* Category Section */}
+      {/* Categories */}
       <div className="category-container">
 
         <p className="category-title">
@@ -178,7 +204,7 @@ function App() {
 
       </div>
 
-      {/* Quote Section */}
+      {/* Quote */}
       <main>
 
         <QuoteCard
@@ -192,11 +218,13 @@ function App() {
 
       </main>
 
-      {/* Footer */}
+      {/* Modern Footer */}
       <footer>
-        <p>
-          Built with React.js ❤️
+        <p className="footer-message">
+          <span>✨</span>
+          Find inspiration. Share positivity. Keep moving forward.
         </p>
+
       </footer>
 
     </div>
